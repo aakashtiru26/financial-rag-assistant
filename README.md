@@ -227,4 +227,4 @@ Treat all responses as document-grounded summaries only — not investment, acco
 
 ## License
 
-MIT
+MIT# financial-rag-assistant
