@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+
+# Data directories (keep structure, ignore content)
+data/uploads/*
+data/index/*
+data/metadata/*
+!data/uploads/.gitkeep
+!data/index/.gitkeep
+!data/metadata/.gitkeep
+
+# FAISS index files (may land outside data/ too)
+*.faiss
+*.pkl
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker
+*.log
+
+# Distribution
+dist/
+build/
+*.egg-info/

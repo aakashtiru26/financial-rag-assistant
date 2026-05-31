@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enterprise Financial RAG Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">FR</div>
+          <div>
+            <h1>Financial RAG</h1>
+            <p id="healthText">Checking service</p>
+          </div>
+        </div>
+
+        <section class="panel compact">
+          <div class="panel-heading">
+            <h2>Access</h2>
+            <span class="status-pill" id="authStatus">Unset</span>
+          </div>
+          <label class="field">
+            <span>API key</span>
+            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="X-API-Key" />
+          </label>
+          <div class="button-row">
+            <button class="btn primary" id="saveKeyButton" type="button">
+              <i data-lucide="key-round"></i>
+              Save
+            </button>
+            <button class="btn ghost" id="clearKeyButton" type="button" title="Clear saved API key">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel compact">
+          <div class="panel-heading">
+            <h2>Index</h2>
+            <span class="metric" id="documentCount">0 docs</span>
+          </div>
+          <div class="drop-zone" id="dropZone">
+            <i data-lucide="file-up"></i>
+            <span id="fileLabel">Select PDF, DOCX, TXT, or CSV</span>
+            <button class="btn secondary" id="browseButton" type="button">
+              <i data-lucide="folder-open"></i>
+              Browse files
+            </button>
+            <input id="fileInput" class="file-input" type="file" accept=".pdf,.docx,.txt,.csv" />
+            <span class="file-hint">You can also use the native file selector above.</span>
+          </div>
+          <button class="btn primary wide" id="uploadButton" type="button">
+            <i data-lucide="upload-cloud"></i>
+            Upload & index
+          </button>
+          <button class="btn secondary wide" id="reindexButton" type="button">
+            <i data-lucide="refresh-cw"></i>
+            Re-index all
+          </button>
+        </section>
+
+        <section class="panel compact status-panel">
+          <div class="panel-heading">
+            <h2>Run State</h2>
+            <span class="status-dot" id="runDot"></span>
+          </div>
+          <p id="statusText">Ready</p>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Enterprise Knowledge Base</p>
+            <h2>Grounded financial Q&A</h2>
+          </div>
+          <div class="topbar-actions">
+            <a class="icon-link" href="/docs" target="_blank" rel="noreferrer" title="Open API docs">
+              <i data-lucide="book-open"></i>
+              API docs
+            </a>
+          </div>
+        </header>
+
+        <section class="query-layout">
+          <div class="question-panel">
+            <div class="question-card">
+              <div class="panel-heading">
+                <h3>Question</h3>
+                <label class="topk-control">
+                  <span>Top K</span>
+                  <input id="topKInput" type="number" min="1" max="20" value="5" />
+                </label>
+              </div>
+              <textarea
+                id="questionInput"
+                rows="5"
+                placeholder="Ask about revenue drivers, risk factors, liquidity, segment performance, or policy details."
+              ></textarea>
+              <div class="button-row end">
+                <button class="btn ghost" id="clearAnswerButton" type="button">
+                  <i data-lucide="eraser"></i>
+                  Clear
+                </button>
+                <button class="btn primary" id="askButton" type="button">
+                  <i data-lucide="send"></i>
+                  Ask
+                </button>
+              </div>
+            </div>
+
+            <div class="answer-card">
+              <div class="panel-heading">
+                <h3>Answer</h3>
+                <span class="metric" id="citationCount">0 citations</span>
+              </div>
+              <div class="answer-body" id="answerBody">
+                <p class="empty-state">No answer yet.</p>
+              </div>
+            </div>
+          </div>
+
+          <aside class="evidence-panel">
+            <div class="panel-heading">
+              <h3>Evidence</h3>
+              <span class="metric" id="sourceCount">0 chunks</span>
+            </div>
+            <div class="source-list" id="sourceList">
+              <p class="empty-state">Retrieved passages will appear here.</p>
+            </div>
+          </aside>
+        </section>
+
+        <section class="documents-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Indexed Corpus</p>
+              <h2>Documents</h2>
+            </div>
+            <button class="btn secondary" id="refreshButton" type="button">
+              <i data-lucide="rotate-cw"></i>
+              Refresh
+            </button>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Chunks</th>
+                  <th>Uploaded</th>
+                  <th>Document ID</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="documentsTable">
+                <tr>
+                  <td colspan="5" class="empty-cell">No documents loaded.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>
