@@ -1,9 +1,7 @@
 import logging
-
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
-
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from app.core.config import Settings
 from app.core.exceptions import AppError
 from app.utils.file_utils import clear_directory
@@ -15,10 +13,9 @@ class VectorStoreService:
         self.settings = settings
         self.index_dir = settings.index_dir
 
-    def _embeddings(self) -> OpenAIEmbeddings:
-        return OpenAIEmbeddings(
-            model="text-embedding-3-small",
-            api_key=self.settings.openai_api_key,
+    def _embeddings(self) -> HuggingFaceEmbeddings:
+        return HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
 
     def exists(self) -> bool:
@@ -48,7 +45,7 @@ class VectorStoreService:
         except Exception as exc:
             logger.exception("Failed to build FAISS index")
             raise AppError(
-                "Failed to build FAISS index. Check your OPENAI_API_KEY is set correctly.",
+                "Failed to build FAISS index.",
                 503,
             ) from exc
 
