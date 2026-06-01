@@ -2,7 +2,7 @@ import logging
 from functools import lru_cache
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from app.core.config import Settings
 from app.core.exceptions import AppError
 from app.utils.file_utils import clear_directory
