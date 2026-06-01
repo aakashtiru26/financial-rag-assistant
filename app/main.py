@@ -1,14 +1,11 @@
 from pathlib import Path
-
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
-
 
 def create_app() -> FastAPI:
     settings = get_settings()
@@ -18,10 +15,16 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version="1.0.0",
-        description="Local enterprise financial RAG assistant with FastAPI, LangChain, FAISS, and Ollama.",
+        description="Local enterprise financial RAG assistant.",
     )
     register_exception_handlers(app)
     app.mount("/static", StaticFiles(directory=web_dir), name="static")
+
+    @app.on_event("startup")
+    async def preload_model():
+        """Download and cache the embedding model at startup."""
+        from app.services.vector_store import get_embedding_model
+        get_embedding_model()
 
     @app.get("/")
     async def root() -> FileResponse:
@@ -29,6 +32,5 @@ def create_app() -> FastAPI:
 
     app.include_router(router, prefix="/api/v1")
     return app
-
 
 app = create_app()
