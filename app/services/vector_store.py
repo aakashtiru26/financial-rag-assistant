@@ -10,7 +10,6 @@ from app.utils.file_utils import clear_directory
 
 logger = logging.getLogger(__name__)
 
-
 class VectorStoreService:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings

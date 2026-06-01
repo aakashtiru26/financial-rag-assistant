@@ -1,9 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 class Settings(BaseSettings):
     app_name: str = "Enterprise Financial RAG Assistant"
@@ -13,6 +11,9 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_llm_model: str = "llama3.2:1b"
     ollama_embedding_model: str = "nomic-embed-text"
+
+    groq_api_key: str = ""
+    openai_api_key: str = ""
 
     data_dir: Path = Path("./data")
     upload_dir: Path = Path("./data/uploads")
@@ -45,7 +46,6 @@ class Settings(BaseSettings):
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.index_dir.mkdir(parents=True, exist_ok=True)
         self.metadata_dir.mkdir(parents=True, exist_ok=True)
-
 
 @lru_cache
 def get_settings() -> Settings:
