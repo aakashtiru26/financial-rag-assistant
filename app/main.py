@@ -20,12 +20,6 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
     app.mount("/static", StaticFiles(directory=web_dir), name="static")
 
-    @app.on_event("startup")
-    async def preload_model():
-        """Download and cache the embedding model at startup."""
-        from app.services.vector_store import get_embedding_model
-        get_embedding_model()
-
     @app.get("/")
     async def root() -> FileResponse:
         return FileResponse(web_dir / "index.html")

@@ -11,14 +11,13 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def get_embedding_model():
-    """Load once, reuse forever — avoids re-downloading on every request."""
-    logger.info("Loading embedding model (one-time download)...")
+    logger.info("Loading embedding model...")
     model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_name="sentence-transformers/paraphrase-MiniLM-L3-v2",
         model_kwargs={"device": "cpu"},
         encode_kwargs={"normalize_embeddings": True},
     )
-    logger.info("Embedding model loaded successfully.")
+    logger.info("Embedding model ready.")
     return model
 
 
