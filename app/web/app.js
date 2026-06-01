@@ -1,18 +1,16 @@
 const API_BASE = "/api/v1";
-const STORAGE_KEY = "financial-rag-api-key";
+
+// API key is hardcoded — users never need to enter it
+const HARDCODED_API_KEY = "cc59ef5dc4daebc8cc6cac35b5e2a39b0dbfbc6654d6c31c0dedf24e0a374217";
 
 const state = {
-  apiKey: localStorage.getItem(STORAGE_KEY) || "",
+  apiKey: HARDCODED_API_KEY,
   selectedFile: null,
   documents: [],
 };
 
 const el = {
   healthText: document.getElementById("healthText"),
-  authStatus: document.getElementById("authStatus"),
-  apiKeyInput: document.getElementById("apiKeyInput"),
-  saveKeyButton: document.getElementById("saveKeyButton"),
-  clearKeyButton: document.getElementById("clearKeyButton"),
   documentCount: document.getElementById("documentCount"),
   dropZone: document.getElementById("dropZone"),
   browseButton: document.getElementById("browseButton"),
@@ -36,8 +34,6 @@ const el = {
 };
 
 function init() {
-  el.apiKeyInput.value = state.apiKey;
-  updateAuthStatus();
   bindEvents();
   hydrateIcons();
   checkHealth();
@@ -51,8 +47,6 @@ function hydrateIcons() {
 }
 
 function bindEvents() {
-  el.saveKeyButton.addEventListener("click", saveApiKey);
-  el.clearKeyButton.addEventListener("click", clearApiKey);
   el.browseButton.addEventListener("click", () => {
     if (typeof el.fileInput.showPicker === "function") {
       el.fileInput.showPicker();
@@ -60,10 +54,12 @@ function bindEvents() {
     }
     el.fileInput.click();
   });
+
   el.dropZone.addEventListener("click", (event) => {
     if (event.target.closest("button") || event.target.closest("input")) return;
     el.fileInput.click();
   });
+
   el.fileInput.addEventListener("change", handleFileSelection);
   el.uploadButton.addEventListener("click", uploadDocument);
   el.reindexButton.addEventListener("click", reindexDocuments);
@@ -88,12 +84,9 @@ function bindEvents() {
 }
 
 function apiHeaders(json = true) {
-  const headers = {};
+  const headers = { "X-API-Key": state.apiKey };
   if (json) {
     headers["Content-Type"] = "application/json";
-  }
-  if (state.apiKey) {
-    headers["X-API-Key"] = state.apiKey;
   }
   return headers;
 }
@@ -119,33 +112,6 @@ async function checkHealth() {
   }
 }
 
-function saveApiKey() {
-  state.apiKey = el.apiKeyInput.value.trim();
-  if (state.apiKey) {
-    localStorage.setItem(STORAGE_KEY, state.apiKey);
-    setStatus("API key saved.");
-    toast("API key saved.");
-  } else {
-    localStorage.removeItem(STORAGE_KEY);
-    setStatus("API key cleared.");
-  }
-  updateAuthStatus();
-  loadDocuments();
-}
-
-function clearApiKey() {
-  state.apiKey = "";
-  el.apiKeyInput.value = "";
-  localStorage.removeItem(STORAGE_KEY);
-  updateAuthStatus();
-  setStatus("API key cleared.");
-}
-
-function updateAuthStatus() {
-  el.authStatus.textContent = state.apiKey ? "Ready" : "Unset";
-  el.authStatus.classList.toggle("ready", Boolean(state.apiKey));
-}
-
 function handleFileSelection() {
   const [file] = el.fileInput.files;
   state.selectedFile = file || null;
@@ -153,11 +119,10 @@ function handleFileSelection() {
 }
 
 async function uploadDocument() {
-  if (!requireKey() || !state.selectedFile) {
-    if (!state.selectedFile) toast("Select a document first.", "error");
+  if (!state.selectedFile) {
+    toast("Select a document first.", "error");
     return;
   }
-
   const form = new FormData();
   form.append("file", state.selectedFile);
   await withBusy(el.uploadButton, "Indexing", async () => {
@@ -177,10 +142,6 @@ async function uploadDocument() {
 }
 
 async function loadDocuments() {
-  if (!state.apiKey) {
-    renderDocuments([]);
-    return;
-  }
   await withBusy(el.refreshButton, "Refreshing", async () => {
     try {
       const payload = await apiFetch("/documents", { headers: apiHeaders(false) });
@@ -194,7 +155,6 @@ async function loadDocuments() {
 }
 
 async function deleteDocument(documentId) {
-  if (!requireKey()) return;
   const confirmed = window.confirm("Delete this document and rebuild the index?");
   if (!confirmed) return;
   setStatus("Deleting document and rebuilding index");
@@ -213,7 +173,6 @@ async function deleteDocument(documentId) {
 }
 
 async function reindexDocuments() {
-  if (!requireKey()) return;
   await withBusy(el.reindexButton, "Re-indexing", async () => {
     setStatus("Re-indexing stored documents");
     const payload = await apiFetch("/documents/reindex", {
@@ -227,7 +186,6 @@ async function reindexDocuments() {
 }
 
 async function askQuestion() {
-  if (!requireKey()) return;
   const question = el.questionInput.value.trim();
   if (!question) {
     toast("Enter a question.", "error");
@@ -235,7 +193,7 @@ async function askQuestion() {
   }
   const topK = Number.parseInt(el.topKInput.value, 10) || 5;
   await withBusy(el.askButton, "Asking", async () => {
-    setStatus("Retrieving evidence and generating answer. First local model run can take up to a minute.");
+    setStatus("Retrieving evidence and generating answer...");
     renderLoadingAnswer();
     const payload = await apiFetch("/query", {
       method: "POST",
@@ -267,7 +225,6 @@ function renderDocuments(documents) {
     el.documentsTable.innerHTML = '<tr><td colspan="5" class="empty-cell">No documents loaded.</td></tr>';
     return;
   }
-
   el.documentsTable.innerHTML = documents
     .map((doc) => {
       const uploaded = doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleString() : "Unknown";
@@ -287,7 +244,6 @@ function renderDocuments(documents) {
       `;
     })
     .join("");
-
   el.documentsTable.querySelectorAll("[data-delete]").forEach((button) => {
     button.addEventListener("click", () => deleteDocument(button.dataset.delete));
   });
@@ -299,12 +255,10 @@ function renderAnswer(payload) {
   el.citationCount.textContent = `${(payload.citations || []).length} citations`;
   const sources = payload.sources || [];
   el.sourceCount.textContent = `${sources.length} ${sources.length === 1 ? "chunk" : "chunks"}`;
-
   if (!sources.length) {
     el.sourceList.innerHTML = '<p class="empty-state">No retrieved passages.</p>';
     return;
   }
-
   el.sourceList.innerHTML = sources
     .map((source, index) => {
       const score = typeof source.score === "number" ? source.score.toFixed(3) : "n/a";
@@ -351,12 +305,6 @@ async function withBusy(button, label, task) {
     button.innerHTML = original;
     hydrateIcons();
   }
-}
-
-function requireKey() {
-  if (state.apiKey) return true;
-  toast("Set the API key first.", "error");
-  return false;
 }
 
 function setStatus(message) {
