@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Enterprise Financial RAG Assistant</title>
     <link rel="stylesheet" href="/static/styles.css" />
-    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
-    <script src="/static/app.js" defer></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   </head>
   <body>
     <div class="app-shell">
@@ -15,7 +14,7 @@
           <div class="brand-mark" aria-hidden="true">FR</div>
           <div>
             <h1>Financial RAG</h1>
-            <p id="healthText">Checking service</p>
+            <p id="healthText">Checking service…</p>
           </div>
         </div>
 
@@ -24,19 +23,22 @@
             <h2>Index</h2>
             <span class="metric" id="documentCount">0 docs</span>
           </div>
+
+          <!-- Simple label-based file picker — most reliable cross-browser -->
           <div class="drop-zone" id="dropZone">
             <i data-lucide="file-up"></i>
             <span id="fileLabel">Select PDF, DOCX, TXT, or CSV</span>
-            <button class="btn secondary" id="browseButton" type="button">
+            <label class="btn secondary" for="fileInput" style="cursor:pointer;">
               <i data-lucide="folder-open"></i>
               Browse files
-            </button>
-            <input id="fileInput" class="file-input" type="file" accept=".pdf,.docx,.txt,.csv" />
-            <span class="file-hint">You can also use the native file selector above.</span>
+            </label>
+            <input id="fileInput" type="file" accept=".pdf,.docx,.txt,.csv"
+                   style="display:none;" />
           </div>
+
           <button class="btn primary wide" id="uploadButton" type="button">
             <i data-lucide="upload-cloud"></i>
-            Upload & index
+            Upload &amp; index
           </button>
           <button class="btn secondary wide" id="reindexButton" type="button">
             <i data-lucide="refresh-cw"></i>
@@ -57,10 +59,10 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Enterprise Knowledge Base</p>
-            <h2>Grounded financial Q&A</h2>
+            <h2>Grounded financial Q&amp;A</h2>
           </div>
           <div class="topbar-actions">
-            <a class="icon-link" href="/docs" target="_blank" rel="noreferrer" title="Open API docs">
+            <a class="icon-link" href="/docs" target="_blank" rel="noreferrer">
               <i data-lucide="book-open"></i>
               API docs
             </a>
@@ -77,19 +79,15 @@
                   <input id="topKInput" type="number" min="1" max="20" value="5" />
                 </label>
               </div>
-              <textarea
-                id="questionInput"
-                rows="5"
-                placeholder="Ask about revenue drivers, risk factors, liquidity, segment performance, or policy details."
-              ></textarea>
+              <textarea id="questionInput" rows="5"
+                placeholder="Ask about revenue drivers, risk factors, liquidity, segment performance, or policy details.">
+              </textarea>
               <div class="button-row end">
                 <button class="btn ghost" id="clearAnswerButton" type="button">
-                  <i data-lucide="eraser"></i>
-                  Clear
+                  <i data-lucide="eraser"></i> Clear
                 </button>
                 <button class="btn primary" id="askButton" type="button">
-                  <i data-lucide="send"></i>
-                  Ask
+                  <i data-lucide="send"></i> Ask
                 </button>
               </div>
             </div>
@@ -123,25 +121,19 @@
               <h2>Documents</h2>
             </div>
             <button class="btn secondary" id="refreshButton" type="button">
-              <i data-lucide="rotate-cw"></i>
-              Refresh
+              <i data-lucide="rotate-cw"></i> Refresh
             </button>
           </div>
           <div class="table-shell">
             <table>
               <thead>
                 <tr>
-                  <th>Filename</th>
-                  <th>Chunks</th>
-                  <th>Uploaded</th>
-                  <th>Document ID</th>
-                  <th></th>
+                  <th>Filename</th><th>Chunks</th><th>Uploaded</th>
+                  <th>Document ID</th><th></th>
                 </tr>
               </thead>
               <tbody id="documentsTable">
-                <tr>
-                  <td colspan="5" class="empty-cell">No documents loaded.</td>
-                </tr>
+                <tr><td colspan="5" class="empty-cell">No documents loaded.</td></tr>
               </tbody>
             </table>
           </div>
@@ -149,6 +141,9 @@
       </main>
     </div>
 
-    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <!-- app.js loaded LAST so all DOM elements exist -->
+    <script src="/static/app.js"></script>
   </body>
 </html>
