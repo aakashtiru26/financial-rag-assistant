@@ -40,6 +40,14 @@ class RagService:
 
     def answer(self, question: str, top_k: int | None = None) -> QueryResponse:
         k = top_k or self.settings.retrieval_k
+
+        if not self.vector_store.exists():
+            return QueryResponse(
+                answer="No documents have been indexed yet. Please upload a document first.",
+                citations=[],
+                sources=[],
+            )
+
         retrieved = self.vector_store.search(question, k)
         if not retrieved:
             return QueryResponse(
