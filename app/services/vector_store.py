@@ -1,9 +1,9 @@
 import logging
 from functools import lru_cache
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
-from app.core.config import Settings
+from app.core.config import Settings, get_settings
 from app.core.exceptions import AppError
 from app.utils.file_utils import clear_directory
 
@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def get_embedding_model():
-    logger.info("Loading embedding model...")
-    model = HuggingFaceEmbeddings(
+    settings = get_settings()
+    logger.info("Initialising HuggingFace Inference API embeddings...")
+    model = HuggingFaceInferenceAPIEmbeddings(
+        api_key=settings.huggingface_api_token,
         model_name="sentence-transformers/paraphrase-MiniLM-L3-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
     )
     logger.info("Embedding model ready.")
     return model

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     openai_api_key: str = ""
+    huggingface_api_token: str = ""
 
     data_dir: Path = Path("./data")
     upload_dir: Path = Path("./data/uploads")
