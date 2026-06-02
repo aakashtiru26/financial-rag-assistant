@@ -1,6 +1,6 @@
 // ─── Config ───────────────────────────────────────────────────────────────────
 const API_BASE   = "/api/v1";
-const API_KEY    = "cc59ef5dc4daebc8cc6cac35b5e2a39b0dbfbc6654d6c31c0dedf24e0a374217";
+const API_KEY    = "0c5ed67c5f3d242749de20eb52d3e9861c46b871380a20575af0ff67142136a0";
 
 // ─── State ────────────────────────────────────────────────────────────────────
 const state = { selectedFile: null, documents: [] };

@@ -1,7 +1,7 @@
 import logging
 
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 
 from app.core.config import Settings
 from app.core.exceptions import AppError
@@ -31,10 +31,10 @@ class RagService:
             ]
         )
 
-    def _llm(self) -> ChatOllama:
-        return ChatOllama(
-            model=self.settings.ollama_llm_model,
-            base_url=self.settings.ollama_base_url,
+    def _llm(self) -> ChatGroq:
+        return ChatGroq(
+            model="llama-3.3-70b-versatile",
+            api_key=self.settings.groq_api_key,
             temperature=0,
         )
 
@@ -79,9 +79,9 @@ class RagService:
         try:
             result = chain.invoke({"question": question, "context": "\n\n".join(context_blocks)})
         except Exception as exc:
-            logger.exception("Ollama generation failed")
+            logger.exception("Groq generation failed")
             raise AppError(
-                "Failed to generate answer. Confirm Ollama is running and the LLM model is pulled.",
+                "Failed to generate answer. Check your GROQ_API_KEY and network connection.",
                 503,
             ) from exc
 
